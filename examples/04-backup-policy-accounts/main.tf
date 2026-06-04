@@ -1,11 +1,13 @@
-/*
- * Example: backup policy attached to specific account ids.
- *
- * Demonstrates user story S4 from the T1.03 plan.
- * Composes 2 modules conceptually: terraform-aws-organization (T1.01)
- * + this module (T1.03). The OU module is not needed because attachments
- * target account ids directly (no OU id resolution required).
- */
+terraform {
+  required_version = ">= 1.9"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
 
 module "org" {
   source = "git::https://github.com/wanted-cloud/terraform-aws-organization.git?ref=main"

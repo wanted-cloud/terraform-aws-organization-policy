@@ -1,11 +1,13 @@
-/*
- * Example: single SCP attached to org root.
- *
- * Demonstrates user story S1 from the T1.03 plan.
- * Composes 2 modules in this example: terraform-aws-organization (T1.01)
- * + this module (T1.03). The OU module is not needed because the attachment
- * target is the org root, available directly via module.org.root_id.
- */
+terraform {
+  required_version = ">= 1.9"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
 
 module "org" {
   source = "git::https://github.com/wanted-cloud/terraform-aws-organization.git?ref=main"

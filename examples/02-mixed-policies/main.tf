@@ -1,15 +1,13 @@
-/*
- * Example: mixed policies (SCP + Tag + Backup) attached across OU and account targets.
- *
- * Demonstrates user story S2 from the T1.03 plan.
- * Composes 3 modules conceptually: terraform-aws-organization (T1.01),
- * terraform-aws-organization-unit (T1.0X, not yet implemented), and this
- * module (T1.03). OU ids are literal placeholders pending the OU module
- * shipping a stable outputs interface; account ids are literals as expected.
- *
- * Notes the policy_ids_by_type convenience output downstream consumers
- * may want to pivot on.
- */
+terraform {
+  required_version = ">= 1.9"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
 
 module "org" {
   source = "git::https://github.com/wanted-cloud/terraform-aws-organization.git?ref=main"
@@ -86,22 +84,16 @@ module "policy" {
   }
 
   attachments = {
-    # SCP to root — applies org-wide.
     deny_root_login_to_root = {
       policy_key = "deny_console_root_login"
       target_id  = module.org.root_id
     }
 
-    # Tag policy to a Workloads OU.
     require_env_tag_to_workloads = {
       policy_key = "require_environment_tag"
-
-      # Literal placeholder until terraform-aws-organization-unit ships outputs.
-      # Replace with: module.ou.organizational_units["workloads"].id
-      target_id = "ou-aaaa-bbbbbbbb"
+      target_id  = "ou-aaaa-bbbbbbbb"
     }
 
-    # Backup policy directly to a Production account.
     daily_backup_to_prod_account = {
       policy_key = "daily_backup_workloads"
       target_id  = "111111111111"
