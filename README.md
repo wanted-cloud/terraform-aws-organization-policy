@@ -23,7 +23,9 @@ The following requirements are needed by this module:
 
 ## Providers
 
-No providers.
+The following providers are used by this module:
+
+- <a name="provider_aws"></a> [aws](#provider\_aws) (5.100.0)
 
 ## Required Inputs
 
@@ -73,7 +75,9 @@ No outputs.
 
 ## Resources
 
-No resources.
+The following resources are used by this module:
+
+- [aws_organizations_organization.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/organizations_organization) (data source)
 
 ## Usage
 
