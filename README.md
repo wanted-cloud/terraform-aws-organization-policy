@@ -61,6 +61,33 @@ object({
 
 Default: `{}`
 
+### <a name="input_policies"></a> [policies](#input\_policies)
+
+Description: Map of AWS Organizations policies to author. Key is a stable, user-chosen  
+identifier referenced by var.attachments[*].policy\_key. Each entry defines  
+a policy by type, name, content, optional description, and optional tags.
+
+Policy `content` is a JSON string — typically produced via file("./scp.json"),  
+jsonencode({...}), or heredoc. Per-type content size limits enforced at plan  
+time (override via var.metadata.validator\_expressions):
+  - SERVICE\_CONTROL\_POLICY    / RESOURCE\_CONTROL\_POLICY : 5120 bytes
+  - AISERVICES\_OPT\_OUT\_POLICY                            : 2500 bytes
+  - TAG\_POLICY / BACKUP\_POLICY / CHATBOT\_POLICY          : 10000 bytes
+
+Type:
+
+```hcl
+map(object({
+    name        = string
+    type        = string
+    content     = string
+    description = optional(string, null)
+    tags        = optional(map(string), {})
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
 Description: Module-wide tags applied to every policy resource. Merged with metadata tags (lower precedence) and per-policy tags (higher precedence) per ADR-O5.
@@ -77,6 +104,7 @@ No outputs.
 
 The following resources are used by this module:
 
+- [aws_organizations_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_policy) (resource)
 - [aws_organizations_organization.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/organizations_organization) (data source)
 
 ## Usage
