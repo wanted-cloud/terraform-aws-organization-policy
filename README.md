@@ -59,6 +59,14 @@ object({
 
 Default: `{}`
 
+### <a name="input_tags"></a> [tags](#input\_tags)
+
+Description: Module-wide tags applied to every policy resource. Merged with metadata tags (lower precedence) and per-policy tags (higher precedence) per ADR-O5.
+
+Type: `map(string)`
+
+Default: `{}`
+
 ## Outputs
 
 No outputs.
