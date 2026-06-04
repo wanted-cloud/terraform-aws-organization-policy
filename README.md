@@ -35,6 +35,33 @@ No required inputs.
 
 The following input variables are optional (have default values):
 
+### <a name="input_attachments"></a> [attachments](#input\_attachments)
+
+Description: Map of policy-to-target attachments. Key is a stable, user-chosen identifier
+(typically "<policy\_key>\_to\_<target\_short>"). Each entry binds an in-module  
+policy (by its var.policies key) to a single target.
+
+target\_id formats:
+  - Root:    r-xxxx
+  - OU:      ou-xxxx-yyyyyyyy
+  - Account: 12-digit AWS account id
+
+Per-target attachment limits enforced at plan time (override via  
+var.metadata.validator\_expressions):
+  - SCP / RCP / Chatbot / AI-opt-out : 5 per target
+  - Tag / Backup                     : 10 per target
+
+Type:
+
+```hcl
+map(object({
+    policy_key = string
+    target_id  = string
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_metadata"></a> [metadata](#input\_metadata)
 
 Description: Metadata definitions for the module, this is optional construct allowing override of the module defaults defintions of validation expressions, error messages, resource timeouts and default tags.
@@ -105,6 +132,7 @@ No outputs.
 The following resources are used by this module:
 
 - [aws_organizations_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_policy) (resource)
+- [aws_organizations_policy_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/organizations_policy_attachment) (resource)
 - [aws_organizations_organization.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/organizations_organization) (data source)
 
 ## Usage

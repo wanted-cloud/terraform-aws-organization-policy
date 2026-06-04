@@ -26,3 +26,18 @@ resource "aws_organizations_policy" "this" {
     }
   }
 }
+
+resource "aws_organizations_policy_attachment" "this" {
+  for_each = var.attachments
+
+  policy_id = aws_organizations_policy.this[each.value.policy_key].id
+  target_id = each.value.target_id
+
+  # NOTE: `aws_organizations_policy_attachment` does not expose a `timeouts {}`
+  # block in the AWS provider schema (v5.x) — verified via
+  # `terraform providers schema -json`. Resource-type-keyed timeout overrides
+  # remain surfaced through var.metadata.resource_timeouts for cross-module
+  # consistency but cannot be wired on this resource. The implicit dependency
+  # on aws_organizations_policy.this[each.value.policy_key] orders apply
+  # (policy first) and destroy (attachment first) per ADR-O4.
+}
