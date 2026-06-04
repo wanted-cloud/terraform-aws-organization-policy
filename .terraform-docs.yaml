@@ -3,6 +3,20 @@ formatter: "markdown document"
 header-from: main.tf
 
 content: |-
+  {{ .Header }}
+
+  ## Table of contents
+
+  - [Requirements](#requirements)
+  - [Providers](#providers)
+  - [Variables](#inputs)
+  - [Outputs](#outputs)
+  - [Resources](#resources)
+  - [Usage](#usage)
+  - [Importing existing resources](#importing-existing-resources)
+  - [Gotchas](#gotchas)
+  - [Contributing](#contributing)
+
   {{ .Requirements }}
 
   {{ .Providers }}
@@ -12,6 +26,84 @@ content: |-
   {{ .Outputs }}
 
   {{ .Resources }}
+
+  ## Usage
+
+  > For more detailed examples navigate to `examples` folder of this repository.
+
+  Module was also published via Terraform Registry and can be used as a module from the registry.
+
+  ```hcl
+  module "policy" {
+    source  = "wanted-cloud/organization-policy/aws"
+    version = "~> 0.1"
+
+    policies = {
+      deny_us_east_1 = {
+        name = "deny_us_east_1"
+        type = "SERVICE_CONTROL_POLICY"
+        content = jsonencode({
+          Version = "2012-10-17"
+          Statement = [{
+            Effect    = "Deny"
+            Action    = "*"
+            Resource  = "*"
+            Condition = { StringEquals = { "aws:RequestedRegion" = "us-east-1" } }
+          }]
+        })
+      }
+    }
+
+    attachments = {
+      deny_us_east_1_to_root = {
+        policy_key = "deny_us_east_1"
+        target_id  = "r-xxxx"
+      }
+    }
+  }
+  ```
+
+  ### Minimal — single SCP attached to root
+
+  ```hcl
+  {{ include "./examples/01-single-scp/main.tf" }}
+  ```
+
+  ## Importing existing resources
+
+  When a policy or its attachment already exists in the Organization, import it before the first `terraform apply`:
+
+  ```bash
+  terraform import 'module.policy.aws_organizations_policy.this["scp_baseline"]' p-abcdef12
+  terraform import 'module.policy.aws_organizations_policy_attachment.this["scp_baseline_to_root"]' p-abcdef12:r-xxxx
+  ```
+
+  The policy import key is the 8-character AWS policy id (`p-xxxxxxxx`). The attachment import key is `policy_id:target_id` (colon-separated, policy first). After import, run `terraform plan` and reconcile any drift in `content`, `description`, or `tags`.
+
+  ## Gotchas
+
+  Read these before applying in any organization that matters.
+
+  | # | Gotcha | Mitigation |
+  |---|---|---|
+  | 1 | **Policy type must be enabled at the org root** before any policy of that type can be attached. | T1.01 (`terraform-aws-organization`) owns `enabled_policy_types`. The module surfaces a plan-time precondition error pointing at T1.01. |
+  | 2 | **Per-target attachment limits**: max 5 SCP/RCP/Chatbot/AI-opt-out per target, max 10 Tag/Backup. | The `var.attachments` validator catches module-managed overruns at plan time; out-of-band attachments (Control Tower, console) can still push real AWS state over. |
+  | 3 | **Policy content size limits differ per type**: 5,120 bytes (SCP/RCP), 2,500 (AI opt-out), 10,000 (Tag/Backup/Chatbot). | Per-type size validators fail at plan time with the specific cap quoted. |
+  | 4 | **Default `FullAWSAccess` SCP is attached to every OU/account.** Removing it (e.g. via a deny-all SCP without an allow path) locks the OU out of every AWS service. | The module does not touch `FullAWSAccess`. Use deny-only SCPs only with caution and never on the management account. |
+  | 5 | **Declarative policies (Tag/Backup/AI-opt-out) apply to the management account too** — SCP and RCP are the only exceptions. | A tag policy attached to root will hit the management account. Validate scope before attaching to root. |
+  | 6 | **Destroying a policy fails while attachments exist (`PolicyInUseException`)**. Module-managed attachments destroy first via the dependency graph; out-of-band attachments block destroy. | Use `aws organizations list-targets-for-policy` to find out-of-band attachments before destroy. |
+  | 7 | **Policy JSON is not validated semantically** — syntactically valid but logically wrong policies apply cleanly and break things. | Use `aws organizations describe-effective-policy` after apply, or test in a sandbox OU first. |
+  | 8 | **OU/account attachments inherit downward** — a tag policy on `ou-workloads` hits every child account. You cannot re-attach per child. | This is AWS-side behavior, not module behavior; design OU hierarchy accordingly. |
+  | 9 | **Backup policy JSON may reference vaults that live in other accounts** — the module does not own those resources. | Ensure referenced vaults exist before the policy triggers; failures surface at backup runtime, not at apply. |
+  | 10 | **Do NOT use `aws_organizations_tag` alongside this module's inline `tags` argument.** Both surfaces try to own tags → perpetual `terraform plan` diff. | This module ships only inline `tags`. If mixing is unavoidable, add `lifecycle.ignore_changes = [tags]` on the parent — but pick one path. |
+
+  ## Contributing
+
+  _Contributions are welcomed and must follow [Code of Conduct](https://github.com/wanted-cloud/.github?tab=coc-ov-file) and common [Contributions guidelines](https://github.com/wanted-cloud/.github/blob/main/docs/CONTRIBUTING.md)._
+
+  > If you'd like to report security issue please follow [security guidelines](https://github.com/wanted-cloud/.github?tab=security-ov-file).
+  ---
+  <sup><sub>_2025 &copy; All rights reserved - WANTED.solutions s.r.o._</sub></sup>
 
 output:
   file: "README.md"
