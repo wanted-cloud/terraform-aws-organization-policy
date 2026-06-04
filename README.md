@@ -125,7 +125,23 @@ Default: `{}`
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_attachments"></a> [attachments](#output\_attachments)
+
+Description: Map of created policy attachments, keyed by the user's var.attachments key. Each entry exposes the AWS-assigned attachment id, the resolved policy\_id, the target\_id, and a pass-through of the policy\_key for traceability.
+
+### <a name="output_policies"></a> [policies](#output\_policies)
+
+Description: Map of created policies, keyed by the user's var.policies key. Each entry exposes the AWS-assigned id, arn, plus pass-through of name, type, and description for convenient referencing in downstream modules.
+
+### <a name="output_policy_ids_by_key"></a> [policy\_ids\_by\_key](#output\_policy\_ids\_by\_key)
+
+Description: Convenience output: map of user-chosen var.policies key => created policy id. Equivalent to a one-field projection of the full policies output; useful when downstream code only needs the id.
+
+### <a name="output_policy_ids_by_type"></a> [policy\_ids\_by\_type](#output\_policy\_ids\_by\_type)
+
+Description: Convenience output: map of policy\_type => list of created policy IDs. Lets downstream modules discover policies by AWS type without knowing the user's for\_each keys. Useful when composing into landing-zone blueprints that filter by type.
 
 ## Resources
 
