@@ -1,3 +1,10 @@
-/*
- * This file is used to define the versions of the providers that are used in the module.
- */
+terraform {
+  required_version = ">= 1.9"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}

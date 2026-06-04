@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# wanted-cloud/terraform-module-template
+# wanted-cloud/terraform-aws-organization-policy
 
-This repository represents a template for a Terraform building block module as we think it should be done, so it's for sure opinionated but in our eyes simple and powerful. Feel free to use or contribute.
+Terraform building block managing AWS Organizations policies and their attachments to root, OUs, or accounts.
 
 ## Table of contents
 
@@ -15,7 +15,11 @@ This repository represents a template for a Terraform building block module as w
 
 ## Requirements
 
-No requirements.
+The following requirements are needed by this module:
+
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9)
+
+- <a name="requirement_aws"></a> [aws](#requirement\_aws) (~> 5.0)
 
 ## Providers
 
@@ -71,20 +75,11 @@ Module was also published via Terraform Registry and can be used as a module fro
 
 ```hcl
 module "example" {
-  source  = "wanted-cloud/..."
+  source  = "wanted-cloud/organization-policy/aws"
   version = "x.y.z"
 }
 ```
 
-### Basic usage example
-
-The minimal usage for the module is as follows:
-
-```hcl
-module "template" {
-    source = "../.."
-}
-```
 ## Contributing
 
 _Contributions are welcomed and must follow [Code of Conduct](https://github.com/wanted-cloud/.github?tab=coc-ov-file) and common [Contributions guidelines](https://github.com/wanted-cloud/.github/blob/main/docs/CONTRIBUTING.md)._

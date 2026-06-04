@@ -26,25 +26,18 @@ content: |-
   {{ .Resources }}
 
   ## Usage
-  
+
   > For more detailed examples navigate to `examples` folder of this repository.
 
   Module was also published via Terraform Registry and can be used as a module from the registry.
 
   ```hcl
   module "example" {
-    source  = "wanted-cloud/..."
+    source  = "wanted-cloud/organization-policy/aws"
     version = "x.y.z"
   }
   ```
 
-  ### Basic usage example
-
-  The minimal usage for the module is as follows:
-
-  ```hcl
-  {{ include "./examples/base/main.tf" }}
-  ```
   ## Contributing
 
   _Contributions are welcomed and must follow [Code of Conduct](https://github.com/wanted-cloud/.github?tab=coc-ov-file) and common [Contributions guidelines](https://github.com/wanted-cloud/.github/blob/main/docs/CONTRIBUTING.md)._
@@ -60,4 +53,3 @@ output:
     <!-- BEGIN_TF_DOCS -->
     {{ .Content }}
     <!-- END_TF_DOCS -->
-    
